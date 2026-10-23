@@ -813,6 +813,40 @@ void UserInterface::SamplingSettings()
                 }
 
                 samplingSettingsChanged |= ImGui::SliderFloat("Spatial Sampling Radius", &m_ui.restirDI.spatialResamplingParams.samplingRadius, 1.f, 32.f);
+
+                samplingSettingsChanged |= ImGui::Checkbox("Enable CGNS Neighbor Selection", (bool*)&m_ui.restirDI.spatialResamplingParams.enableCGNSNeighborSelection);
+                ShowHelpMarker(
+                    "Selects spatial neighbors proportionally to their geometric compatibility instead of sampling them uniformly. "
+                    "The Spatial Samples count is the number of selected neighbors (M), and the Spatial Sampling Radius controls the candidate disk.");
+                if (m_ui.restirDI.spatialResamplingParams.enableCGNSNeighborSelection)
+                {
+                    ImGui::Indent();
+
+                    if (m_ui.restirDI.resamplingMode == rtxdi::ReSTIRDI_ResamplingMode::FusedSpatiotemporal)
+                    {
+                        ImGui::TextDisabled("CGNS applies to the separate spatial resampling pass (Spatial or Temporal + Spatial).");
+                    }
+
+                    samplingSettingsChanged |= ImGui::SliderInt("CGNS Candidate Count", (int*)&m_ui.restirDI.spatialResamplingParams.cgnsNumCandidates, 1, 128);
+                    ShowHelpMarker("K: number of candidate neighbors scored per pixel before weighted reservoir sampling.");
+
+                    samplingSettingsChanged |= ImGui::SliderFloat("CGNS Scale Solid Angle", &m_ui.restirDI.spatialResamplingParams.cgnsScaleSolidAngle, 0.001f, 1.f, "%.3f", ImGuiSliderFlags_Logarithmic);
+                    ShowHelpMarker("Solid angle in steradians that controls the world-space position falloff radius.");
+
+                    samplingSettingsChanged |= ImGui::SliderFloat("CGNS Normal Beta", &m_ui.restirDI.spatialResamplingParams.cgnsNormalBeta, 0.f, 64.f);
+                    ShowHelpMarker("Exponent applied to the normal compatibility term.");
+
+                    samplingSettingsChanged |= ImGui::Checkbox("CGNS Early Stopping", (bool*)&m_ui.restirDI.spatialResamplingParams.enableCGNSEarlyStopping);
+                    ShowHelpMarker("Stops scoring candidates once enough candidates meeting the early stopping cutoff have been found.");
+
+                    if (m_ui.restirDI.spatialResamplingParams.enableCGNSEarlyStopping)
+                    {
+                        samplingSettingsChanged |= ImGui::SliderFloat("CGNS Early Stop Cutoff", &m_ui.restirDI.spatialResamplingParams.cgnsEarlyStopCutoff, 0.f, 1.f);
+                    }
+
+                    ImGui::Unindent();
+                }
+
                 if (m_showAdvancedSamplingSettings && m_ui.restirDI.resamplingMode != rtxdi::ReSTIRDI_ResamplingMode::FusedSpatiotemporal)
                 {
                     samplingSettingsChanged |= ImGui::SliderFloat("Spatial Depth Threshold", &m_ui.restirDI.spatialResamplingParams.depthThreshold, 0.f, 1.f);
