@@ -270,6 +270,24 @@ std::istream& operator>> (std::istream& is, ReSTIRDI_SpatioTemporalBiasCorrectio
     return is;
 }
 
+std::istream& operator>> (std::istream& is, ReSTIRDI_NeighborSelectionMode& mode)
+{
+    std::string s;
+    is >> s;
+    toupper(s);
+
+    if (s == "OFF")
+        mode = ReSTIRDI_NeighborSelectionMode::Off;
+    else if (s == "CGNS")
+        mode = ReSTIRDI_NeighborSelectionMode::CGNS;
+    else if (s == "PVALUE" || s == "P_VALUE" || s == "P-VALUE" || s == "PVAL")
+        mode = ReSTIRDI_NeighborSelectionMode::PValue;
+    else
+        throw cxxopts::exceptions::exception("Unrecognized value passed to the --restirDI.spatialResampling.neighborSelectionMode argument.");
+
+    return is;
+}
+
 std::istream& operator>> (std::istream& is, RTXDI_GIBiasCorrectionMode& mode)
 {
     std::string s;
@@ -520,12 +538,13 @@ void ProcessCommandLine(int argc, char** argv, const std::string& appTitle, donu
         ("restirDI.spatialResampling.enableMaterialSimilarityTest", "ReSTIR DI: spatial material similarity test (0/1)", value(ui.restirDI.spatialResamplingParams.enableMaterialSimilarityTest))
         ("restirDI.spatialResampling.discountNaiveSamples", "ReSTIR DI: spatial discount naive samples (0/1)", value(ui.restirDI.spatialResamplingParams.discountNaiveSamples))
 
-        ("restirDI.spatialResampling.enableCGNS", "ReSTIR DI: CGNS neighbor selection mode (0/1)", value(ui.restirDI.spatialResamplingParams.enableCGNSNeighborSelection))
-        ("restirDI.spatialResampling.cgnsNumCandidates", "ReSTIR DI: CGNS candidate count (K)", value(ui.restirDI.spatialResamplingParams.cgnsNumCandidates))
+        ("restirDI.spatialResampling.neighborSelectionMode", "ReSTIR DI: neighbor selection mode OFF, CGNS, PVALUE (default PVALUE)", value(ui.restirDI.spatialResamplingParams.neighborSelectionMode))
+        ("restirDI.spatialResampling.cgnsNumCandidates", "ReSTIR DI: neighbor candidate count (K)", value(ui.restirDI.spatialResamplingParams.cgnsNumCandidates))
         ("restirDI.spatialResampling.cgnsScaleSolidAngle", "ReSTIR DI: CGNS scale solid angle (sr)", value(ui.restirDI.spatialResamplingParams.cgnsScaleSolidAngle))
         ("restirDI.spatialResampling.cgnsNormalBeta", "ReSTIR DI: CGNS normal compatibility exponent", value(ui.restirDI.spatialResamplingParams.cgnsNormalBeta))
-        ("restirDI.spatialResampling.enableCGNSEarlyStopping", "ReSTIR DI: CGNS early stopping (0/1)", value(ui.restirDI.spatialResamplingParams.enableCGNSEarlyStopping))
-        ("restirDI.spatialResampling.cgnsEarlyStopCutoff", "ReSTIR DI: CGNS early stopping score cutoff", value(ui.restirDI.spatialResamplingParams.cgnsEarlyStopCutoff))
+        ("restirDI.spatialResampling.enableCGNSEarlyStopping", "ReSTIR DI: neighbor selection early stopping (0/1)", value(ui.restirDI.spatialResamplingParams.enableCGNSEarlyStopping))
+        ("restirDI.spatialResampling.cgnsEarlyStopCutoff", "ReSTIR DI: neighbor selection early stopping score cutoff", value(ui.restirDI.spatialResamplingParams.cgnsEarlyStopCutoff))
+        ("restirDI.spatialResampling.pValueThreshold", "ReSTIR DI: p-value threshold for PValue neighbor selection", value(ui.restirDI.spatialResamplingParams.pValueThreshold))
 
         ("restirDI.boilingFilter.enableBoilingFilter", "ReSTIR DI: enable boiling filter (0/1)", value(ui.restirDI.boilingFilter.enableBoilingFilter))
         ("restirDI.boilingFilter.boilingFilterStrength", "ReSTIR DI: boiling filter strength", value(ui.restirDI.boilingFilter.boilingFilterStrength))

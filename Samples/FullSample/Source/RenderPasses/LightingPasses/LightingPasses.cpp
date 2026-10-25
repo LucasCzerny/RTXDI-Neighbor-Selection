@@ -439,9 +439,9 @@ void LightingPasses::CreateReGIRPipeline(const rtxdi::ReGIRStaticParameters& reg
     }
 }
 
-void LightingPasses::CreateReSTIRDIPipelines(const std::vector<donut::engine::ShaderMacro>& regirMacros, bool useRayQuery)
+void LightingPasses::CreateReSTIRDIPipelines(const std::vector<donut::engine::ShaderMacro>& regirMacros, bool useRayQuery, uint32_t neighborSelectionMode)
 {
-    m_restirDIPasses.LoadShaders(m_device, *m_shaderFactory, useRayQuery, regirMacros, m_bindingLayout, m_bindlessLayout);
+    m_restirDIPasses.LoadShaders(m_device, *m_shaderFactory, useRayQuery, regirMacros, neighborSelectionMode, m_bindingLayout, m_bindlessLayout);
 }
 
 void LightingPasses::CreateReSTIRGIPipelines(const std::vector<donut::engine::ShaderMacro>& regirMacros, bool useRayQuery)
@@ -456,7 +456,7 @@ void LightingPasses::CreateReSTIRPTPipelines(bool useRayQuery)
     m_restirPTPasses.LoadShaders(m_device, *m_shaderFactory, useRayQuery, m_bindingLayout, m_bindlessLayout);
 }
 
-void LightingPasses::CreatePipelines(const rtxdi::ReGIRStaticParameters& regirStaticParams, bool useRayQuery)
+void LightingPasses::CreatePipelines(const rtxdi::ReGIRStaticParameters& regirStaticParams, bool useRayQuery, uint32_t neighborSelectionMode)
 {
     std::vector<donut::engine::ShaderMacro> regirMacros = {
         GetRegirMacro(regirStaticParams)
@@ -464,7 +464,7 @@ void LightingPasses::CreatePipelines(const rtxdi::ReGIRStaticParameters& regirSt
 
     CreatePresamplingPipelines();
     CreateReGIRPipeline(regirStaticParams, regirMacros);
-    CreateReSTIRDIPipelines(regirMacros, useRayQuery);
+    CreateReSTIRDIPipelines(regirMacros, useRayQuery, neighborSelectionMode);
     CreateReSTIRGIPipelines(regirMacros, useRayQuery);
     CreateReSTIRPTPipelines(useRayQuery);
 }

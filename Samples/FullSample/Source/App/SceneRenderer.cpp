@@ -805,7 +805,7 @@ void SceneRenderer::SetupRenderPasses(uint32_t renderWidth, uint32_t renderHeigh
     if (m_rtxdiResourcesCreated || m_ui.reloadShaders)
     {
         // Some RTXDI context settings affect the shader permutations
-        m_lightingPasses->CreatePipelines(m_ui.regirStaticParams, m_ui.useRayQuery);
+        m_lightingPasses->CreatePipelines(m_ui.regirStaticParams, m_ui.useRayQuery, uint32_t(m_ui.restirDI.spatialResamplingParams.neighborSelectionMode));
     }
 
     m_ui.reloadShaders = false;

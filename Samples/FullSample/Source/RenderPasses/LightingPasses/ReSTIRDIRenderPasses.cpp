@@ -12,6 +12,8 @@
 
 #include "ReSTIRDIRenderPasses.h"
 
+#include <string>
+
 #include <donut/core/math/math.h>
 #include <donut/engine/View.h>
 #include <donut/engine/ShaderFactory.h>
@@ -34,13 +36,20 @@ ReSTIRDIRenderPasses::~ReSTIRDIRenderPasses()
 
 }
 
-void ReSTIRDIRenderPasses::LoadShaders(nvrhi::DeviceHandle device, donut::engine::ShaderFactory& shaderFactory, bool useRayQuery, const std::vector<donut::engine::ShaderMacro>& regirMacros, nvrhi::BindingLayoutHandle bindingLayout, nvrhi::BindingLayoutHandle bindlessLayout)
+void ReSTIRDIRenderPasses::LoadShaders(nvrhi::DeviceHandle device, donut::engine::ShaderFactory& shaderFactory, bool useRayQuery, const std::vector<donut::engine::ShaderMacro>& regirMacros, uint32_t neighborSelectionMode, nvrhi::BindingLayoutHandle bindingLayout, nvrhi::BindingLayoutHandle bindlessLayout)
 {
+    std::vector<donut::engine::ShaderMacro> selectionMacros = {
+        { "RTXDI_DI_NEIGHBOR_SELECTION_MODE", std::to_string(neighborSelectionMode) }
+    };
+
+    std::vector<donut::engine::ShaderMacro> regirAndSelectionMacros = regirMacros;
+    regirAndSelectionMacros.insert(regirAndSelectionMacros.end(), selectionMacros.begin(), selectionMacros.end());
+
     // Resampling shaders
-    m_generateInitialSamplesPass.Init(device, shaderFactory, "app/LightingPasses/DI/GenerateInitialSamples.hlsl", regirMacros, useRayQuery, RTXDI_SCREEN_SPACE_GROUP_SIZE, bindingLayout, nullptr, bindlessLayout);
-    m_temporalResamplingPass.Init(device, shaderFactory, "app/LightingPasses/DI/TemporalResampling.hlsl", {}, useRayQuery, RTXDI_SCREEN_SPACE_GROUP_SIZE, bindingLayout, nullptr, bindlessLayout);
-    m_spatialResamplingPass.Init(device, shaderFactory, "app/LightingPasses/DI/SpatialResampling.hlsl", {}, useRayQuery, RTXDI_SCREEN_SPACE_GROUP_SIZE, bindingLayout, nullptr, bindlessLayout);
-    m_fusedResamplingPass.Init(device, shaderFactory, "app/LightingPasses/DI/FusedResampling.hlsl", regirMacros, useRayQuery, RTXDI_SCREEN_SPACE_GROUP_SIZE, bindingLayout, nullptr, bindlessLayout);
+    m_generateInitialSamplesPass.Init(device, shaderFactory, "app/LightingPasses/DI/GenerateInitialSamples.hlsl", regirAndSelectionMacros, useRayQuery, RTXDI_SCREEN_SPACE_GROUP_SIZE, bindingLayout, nullptr, bindlessLayout);
+    m_temporalResamplingPass.Init(device, shaderFactory, "app/LightingPasses/DI/TemporalResampling.hlsl", selectionMacros, useRayQuery, RTXDI_SCREEN_SPACE_GROUP_SIZE, bindingLayout, nullptr, bindlessLayout);
+    m_spatialResamplingPass.Init(device, shaderFactory, "app/LightingPasses/DI/SpatialResampling.hlsl", selectionMacros, useRayQuery, RTXDI_SCREEN_SPACE_GROUP_SIZE, bindingLayout, nullptr, bindlessLayout);
+    m_fusedResamplingPass.Init(device, shaderFactory, "app/LightingPasses/DI/FusedResampling.hlsl", regirAndSelectionMacros, useRayQuery, RTXDI_SCREEN_SPACE_GROUP_SIZE, bindingLayout, nullptr, bindlessLayout);
     m_shadeSamplesPass.Init(device, shaderFactory, "app/LightingPasses/DI/ShadeSamples.hlsl", regirMacros, false, RTXDI_SCREEN_SPACE_GROUP_SIZE, bindingLayout, nullptr, bindlessLayout);
     m_gradientsPass.Init(device, shaderFactory, "app/DenoisingPasses/ComputeGradients.hlsl", {}, useRayQuery, RTXDI_SCREEN_SPACE_GROUP_SIZE, bindingLayout, nullptr, bindlessLayout);
 }

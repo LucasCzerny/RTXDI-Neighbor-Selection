@@ -86,6 +86,15 @@ void main(uint2 globalIndex : SV_DispatchThreadID)
     case DI_RESERVOIR_FIELD_CANONICAL_WEIGHT:
         t_Output[pixelPosition] = reservoir.canonicalWeight;
     break;
+    case DI_RESERVOIR_FIELD_MEAN:
+        t_Output[pixelPosition] = reservoir.mean;
+    break;
+    case DI_RESERVOIR_FIELD_VARIANCE:
+        t_Output[pixelPosition] = reservoir.variance;
+    break;
+    case DI_RESERVOIR_FIELD_STAT_M:
+        t_Output[pixelPosition] = reservoir.statM;
+    break;
     }
 }
 

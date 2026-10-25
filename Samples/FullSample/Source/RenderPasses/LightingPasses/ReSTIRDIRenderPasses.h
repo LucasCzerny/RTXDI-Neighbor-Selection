@@ -12,6 +12,7 @@
 
 #pragma once
 
+#include <cstdint>
 #include <memory>
 #include <vector>
 #include "RenderPasses/RayTracingPass.h"
@@ -43,7 +44,7 @@ public:
     ReSTIRDIRenderPasses(std::shared_ptr<Profiler> profiler);
     ~ReSTIRDIRenderPasses();
 
-    void LoadShaders(nvrhi::DeviceHandle device, donut::engine::ShaderFactory& shaderFactory, bool useRayQuery, const std::vector<donut::engine::ShaderMacro>& regirMacros, nvrhi::BindingLayoutHandle bindingLayout, nvrhi::BindingLayoutHandle bindlessLayout);
+    void LoadShaders(nvrhi::DeviceHandle device, donut::engine::ShaderFactory& shaderFactory, bool useRayQuery, const std::vector<donut::engine::ShaderMacro>& regirMacros, uint32_t neighborSelectionMode, nvrhi::BindingLayoutHandle bindingLayout, nvrhi::BindingLayoutHandle bindlessLayout);
 
     // Updated when resources change (screen resize or scene change)
     void SetBindingSet(nvrhi::IBindingSet* bindingSet);
