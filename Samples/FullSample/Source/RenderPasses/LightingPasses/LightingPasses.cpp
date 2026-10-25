@@ -204,6 +204,7 @@ LightingPasses::LightingPasses(
         nvrhi::BindingLayoutItem::StructuredBuffer_UAV(6),
         nvrhi::BindingLayoutItem::StructuredBuffer_UAV(7),
         nvrhi::BindingLayoutItem::RawBuffer_UAV(8),
+        nvrhi::BindingLayoutItem::StructuredBuffer_UAV(31),
 
         nvrhi::BindingLayoutItem::TypedBuffer_UAV(10),
         nvrhi::BindingLayoutItem::TypedBuffer_UAV(11),
@@ -306,6 +307,7 @@ void LightingPasses::CreateBindingSet(
             nvrhi::BindingSetItem::StructuredBuffer_UAV(6, resources.GIReservoirBuffer),
             nvrhi::BindingSetItem::StructuredBuffer_UAV(7, resources.PTReservoirBuffer),
             nvrhi::BindingSetItem::RawBuffer_UAV(8, resources.SpatialNeighborSelectionBuffer),
+            nvrhi::BindingSetItem::StructuredBuffer_UAV(31, resources.DIReservoirStatsBuffer),
 
             nvrhi::BindingSetItem::TypedBuffer_UAV(10, resources.RisBuffer),
             nvrhi::BindingSetItem::TypedBuffer_UAV(11, resources.RisLightDataBuffer),
@@ -352,6 +354,7 @@ void LightingPasses::CreateBindingSet(
     m_localLightPdfTextureSize.y = localLightPdfDesc.height;
 
     m_DIReservoirBuffer = resources.DIReservoirBuffer;
+    m_DIReservoirStatsBuffer = resources.DIReservoirStatsBuffer;
     m_secondarySurfaceBuffer = resources.SecondaryGBuffer;
     m_GIReservoirBuffer = resources.GIReservoirBuffer;
 
@@ -684,7 +687,7 @@ void LightingPasses::RenderDirectLighting(
     m_restirDIPasses.EnableRayCounts(localSettings.enableRayCounts);
     m_restirDIPasses.SetDescriptorTable(m_scene->GetDescriptorTable());
     m_restirDIPasses.SetBindingSet(m_bindingSet);
-    m_restirDIPasses.Render(commandList, view, context, m_DIReservoirBuffer);
+    m_restirDIPasses.Render(commandList, view, context, m_DIReservoirBuffer, m_DIReservoirStatsBuffer);
 }
 
 void LightingPasses::RenderIndirectLighting(

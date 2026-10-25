@@ -835,7 +835,11 @@ void UserInterface::SamplingSettings()
                         ImGui::TextDisabled("Neighbor selection applies to the separate spatial resampling pass (Spatial or Temporal + Spatial).");
                     }
 
-                    samplingSettingsChanged |= ImGui::SliderInt("Neighbor Candidate Count", (int*)&m_ui.restirDI.spatialResamplingParams.cgnsNumCandidates, 1, 128);
+                    uint32_t* candidateCount = &m_ui.restirDI.spatialResamplingParams.cgnsNumCandidates;
+                    if (m_ui.restirDI.spatialResamplingParams.neighborSelectionMode == ReSTIRDI_NeighborSelectionMode::PValue)
+                        candidateCount = &m_ui.restirDI.spatialResamplingParams.pValueNumCandidates;
+
+                    samplingSettingsChanged |= ImGui::SliderInt("Neighbor Candidate Count", (int*)candidateCount, 1, 128);
                     ShowHelpMarker("K: number of candidate neighbors scored per pixel before weighted reservoir sampling.");
 
                     if (m_ui.restirDI.spatialResamplingParams.neighborSelectionMode == ReSTIRDI_NeighborSelectionMode::CGNS)
@@ -854,11 +858,18 @@ void UserInterface::SamplingSettings()
                     }
 
                     samplingSettingsChanged |= ImGui::Checkbox("Early Stopping", (bool*)&m_ui.restirDI.spatialResamplingParams.enableCGNSEarlyStopping);
-                    ShowHelpMarker("Stops scoring candidates once enough candidates reach the early stopping score.");
+                    ShowHelpMarker("Stops scoring candidates once enough candidates reach the early stopping threshold.");
 
                     if (m_ui.restirDI.spatialResamplingParams.enableCGNSEarlyStopping)
                     {
-                        samplingSettingsChanged |= ImGui::SliderFloat("Early Stop Score", &m_ui.restirDI.spatialResamplingParams.cgnsEarlyStopCutoff, 0.f, 1.f);
+                        if (m_ui.restirDI.spatialResamplingParams.neighborSelectionMode == ReSTIRDI_NeighborSelectionMode::CGNS)
+                        {
+                            samplingSettingsChanged |= ImGui::SliderFloat("Early Stop Score", &m_ui.restirDI.spatialResamplingParams.cgnsEarlyStopCutoff, 0.f, 1.f);
+                        }
+                        else
+                        {
+                            samplingSettingsChanged |= ImGui::SliderFloat("P-Value Early Stop Threshold", &m_ui.restirDI.spatialResamplingParams.pValueEarlyStopThreshold, 0.f, 1.f);
+                        }
                     }
 
                     ImGui::Unindent();

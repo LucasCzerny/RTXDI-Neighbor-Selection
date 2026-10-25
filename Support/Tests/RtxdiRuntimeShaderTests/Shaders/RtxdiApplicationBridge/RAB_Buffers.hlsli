@@ -3,12 +3,14 @@
 
 RWBuffer<uint2> u_RisBuffer : register(u10);
 RWStructuredBuffer<RTXDI_PackedDIReservoir> u_LightReservoirs : register(u0);
+RWStructuredBuffer<float4> u_DIReservoirStats : register(u31);
 Buffer<float2> t_NeighborOffsets : register(t21);
 RWStructuredBuffer<RTXDI_PackedGIReservoir> u_GIReservoirs : register(u6);
 RWStructuredBuffer<RTXDI_PackedPTReservoir> u_PTReservoirs : register(u7);
 
 #define RTXDI_RIS_BUFFER u_RisBuffer
 #define RTXDI_LIGHT_RESERVOIR_BUFFER u_LightReservoirs
+#define RTXDI_DI_RESERVOIR_STATS_BUFFER u_DIReservoirStats
 #define RTXDI_NEIGHBOR_OFFSETS_BUFFER t_NeighborOffsets
 #define RTXDI_GI_RESERVOIR_BUFFER u_GIReservoirs
 #define RTXDI_PT_RESERVOIR_BUFFER u_PTReservoirs

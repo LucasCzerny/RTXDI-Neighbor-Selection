@@ -50,7 +50,7 @@ void ReSTIRDIRenderPasses::LoadShaders(nvrhi::DeviceHandle device, donut::engine
     m_temporalResamplingPass.Init(device, shaderFactory, "app/LightingPasses/DI/TemporalResampling.hlsl", selectionMacros, useRayQuery, RTXDI_SCREEN_SPACE_GROUP_SIZE, bindingLayout, nullptr, bindlessLayout);
     m_spatialResamplingPass.Init(device, shaderFactory, "app/LightingPasses/DI/SpatialResampling.hlsl", selectionMacros, useRayQuery, RTXDI_SCREEN_SPACE_GROUP_SIZE, bindingLayout, nullptr, bindlessLayout);
     m_fusedResamplingPass.Init(device, shaderFactory, "app/LightingPasses/DI/FusedResampling.hlsl", regirAndSelectionMacros, useRayQuery, RTXDI_SCREEN_SPACE_GROUP_SIZE, bindingLayout, nullptr, bindlessLayout);
-    m_shadeSamplesPass.Init(device, shaderFactory, "app/LightingPasses/DI/ShadeSamples.hlsl", regirMacros, false, RTXDI_SCREEN_SPACE_GROUP_SIZE, bindingLayout, nullptr, bindlessLayout);
+    m_shadeSamplesPass.Init(device, shaderFactory, "app/LightingPasses/DI/ShadeSamples.hlsl", regirAndSelectionMacros, false, RTXDI_SCREEN_SPACE_GROUP_SIZE, bindingLayout, nullptr, bindlessLayout);
     m_gradientsPass.Init(device, shaderFactory, "app/DenoisingPasses/ComputeGradients.hlsl", {}, useRayQuery, RTXDI_SCREEN_SPACE_GROUP_SIZE, bindingLayout, nullptr, bindlessLayout);
 }
 
@@ -90,7 +90,8 @@ static void ExecuteRayTracingPass(nvrhi::ICommandList* commandList,
 void ReSTIRDIRenderPasses::Render(nvrhi::ICommandList* commandList,
     const donut::engine::IView& view,
     rtxdi::ReSTIRDIContext& context,
-    nvrhi::BufferHandle diReservoirBuffer)
+    nvrhi::BufferHandle diReservoirBuffer,
+    nvrhi::BufferHandle diReservoirStatsBuffer)
 {
     dm::int2 dispatchSize = {
     view.GetViewExtent().width(),
@@ -109,6 +110,7 @@ void ReSTIRDIRenderPasses::Render(nvrhi::ICommandList* commandList,
     if (context.GetResamplingMode() == rtxdi::ReSTIRDI_ResamplingMode::FusedSpatiotemporal)
     {
         nvrhi::utils::BufferUavBarrier(commandList, diReservoirBuffer);
+        nvrhi::utils::BufferUavBarrier(commandList, diReservoirStatsBuffer);
 
         ExecuteRayTracingPass(commandList, m_fusedResamplingPass, m_enableRayCounts, "DIFusedResampling", dispatchSize, *m_profiler, ProfilerSection::Shading, m_descriptorTable, m_bindingSet);
     }
@@ -119,6 +121,7 @@ void ReSTIRDIRenderPasses::Render(nvrhi::ICommandList* commandList,
         if (context.GetResamplingMode() == rtxdi::ReSTIRDI_ResamplingMode::Temporal || context.GetResamplingMode() == rtxdi::ReSTIRDI_ResamplingMode::TemporalAndSpatial)
         {
             nvrhi::utils::BufferUavBarrier(commandList, diReservoirBuffer);
+            nvrhi::utils::BufferUavBarrier(commandList, diReservoirStatsBuffer);
 
             ExecuteRayTracingPass(commandList, m_temporalResamplingPass, m_enableRayCounts, "DITemporalResampling", dispatchSize, *m_profiler, ProfilerSection::TemporalResampling, m_descriptorTable, m_bindingSet);
         }
@@ -126,11 +129,13 @@ void ReSTIRDIRenderPasses::Render(nvrhi::ICommandList* commandList,
         if (context.GetResamplingMode() == rtxdi::ReSTIRDI_ResamplingMode::Spatial || context.GetResamplingMode() == rtxdi::ReSTIRDI_ResamplingMode::TemporalAndSpatial)
         {
             nvrhi::utils::BufferUavBarrier(commandList, diReservoirBuffer);
+            nvrhi::utils::BufferUavBarrier(commandList, diReservoirStatsBuffer);
 
             ExecuteRayTracingPass(commandList, m_spatialResamplingPass, m_enableRayCounts, "DISpatialResampling", dispatchSize, *m_profiler, ProfilerSection::SpatialResampling, m_descriptorTable, m_bindingSet);
         }
 
         nvrhi::utils::BufferUavBarrier(commandList, diReservoirBuffer);
+        nvrhi::utils::BufferUavBarrier(commandList, diReservoirStatsBuffer);
 
         ExecuteRayTracingPass(commandList, m_shadeSamplesPass, m_enableRayCounts, "DIShadeSamples", dispatchSize, *m_profiler, ProfilerSection::Shading, m_descriptorTable, m_bindingSet);
     }
@@ -138,6 +143,7 @@ void ReSTIRDIRenderPasses::Render(nvrhi::ICommandList* commandList,
     if (m_enableGradients)
     {
         nvrhi::utils::BufferUavBarrier(commandList, diReservoirBuffer);
+        nvrhi::utils::BufferUavBarrier(commandList, diReservoirStatsBuffer);
         auto gradientsDispatchSize = (dispatchSize + RTXDI_GRAD_FACTOR - 1) / RTXDI_GRAD_FACTOR;
         ExecuteRayTracingPass(commandList, m_gradientsPass, m_enableRayCounts, "DIGradients", gradientsDispatchSize, *m_profiler, ProfilerSection::Gradients, m_descriptorTable, m_bindingSet);
     }

@@ -55,7 +55,8 @@ public:
     void Render(nvrhi::ICommandList* commandList,
                 const donut::engine::IView& view,
                 rtxdi::ReSTIRDIContext& context,
-                nvrhi::BufferHandle diReservoirBuffer);
+                nvrhi::BufferHandle diReservoirBuffer,
+                nvrhi::BufferHandle diReservoirStatsBuffer);
 
     void EnableGradients(bool enable);
     bool GradientsEnabled() const;

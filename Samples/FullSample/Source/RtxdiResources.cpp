@@ -128,6 +128,15 @@ RtxdiResources::RtxdiResources(
     diReservoirBufferDesc.canHaveUAVs = true;
     DIReservoirBuffer = device->createBuffer(diReservoirBufferDesc);
 
+    nvrhi::BufferDesc diReservoirStatsBufferDesc;
+    diReservoirStatsBufferDesc.byteSize = sizeof(dm::float4) * context.GetReservoirBufferParameters().reservoirArrayPitch * rtxdi::c_NumReSTIRDIReservoirBuffers;
+    diReservoirStatsBufferDesc.structStride = sizeof(dm::float4);
+    diReservoirStatsBufferDesc.initialState = nvrhi::ResourceStates::UnorderedAccess;
+    diReservoirStatsBufferDesc.keepInitialState = true;
+    diReservoirStatsBufferDesc.debugName = "DIReservoirStatsBuffer";
+    diReservoirStatsBufferDesc.canHaveUAVs = true;
+    DIReservoirStatsBuffer = device->createBuffer(diReservoirStatsBufferDesc);
+
 
     nvrhi::BufferDesc secondaryGBufferDesc;
     secondaryGBufferDesc.byteSize = sizeof(SecondaryGBufferData) * context.GetReservoirBufferParameters().reservoirArrayPitch;

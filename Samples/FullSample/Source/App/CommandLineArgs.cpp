@@ -539,12 +539,14 @@ void ProcessCommandLine(int argc, char** argv, const std::string& appTitle, donu
         ("restirDI.spatialResampling.discountNaiveSamples", "ReSTIR DI: spatial discount naive samples (0/1)", value(ui.restirDI.spatialResamplingParams.discountNaiveSamples))
 
         ("restirDI.spatialResampling.neighborSelectionMode", "ReSTIR DI: neighbor selection mode OFF, CGNS, PVALUE (default PVALUE)", value(ui.restirDI.spatialResamplingParams.neighborSelectionMode))
-        ("restirDI.spatialResampling.cgnsNumCandidates", "ReSTIR DI: neighbor candidate count (K)", value(ui.restirDI.spatialResamplingParams.cgnsNumCandidates))
+        ("restirDI.spatialResampling.cgnsNumCandidates", "ReSTIR DI: CGNS candidate count (K, default 32)", value(ui.restirDI.spatialResamplingParams.cgnsNumCandidates))
         ("restirDI.spatialResampling.cgnsScaleSolidAngle", "ReSTIR DI: CGNS scale solid angle (sr)", value(ui.restirDI.spatialResamplingParams.cgnsScaleSolidAngle))
         ("restirDI.spatialResampling.cgnsNormalBeta", "ReSTIR DI: CGNS normal compatibility exponent", value(ui.restirDI.spatialResamplingParams.cgnsNormalBeta))
         ("restirDI.spatialResampling.enableCGNSEarlyStopping", "ReSTIR DI: neighbor selection early stopping (0/1)", value(ui.restirDI.spatialResamplingParams.enableCGNSEarlyStopping))
-        ("restirDI.spatialResampling.cgnsEarlyStopCutoff", "ReSTIR DI: neighbor selection early stopping score cutoff", value(ui.restirDI.spatialResamplingParams.cgnsEarlyStopCutoff))
+        ("restirDI.spatialResampling.cgnsEarlyStopCutoff", "ReSTIR DI: CGNS early stopping score cutoff", value(ui.restirDI.spatialResamplingParams.cgnsEarlyStopCutoff))
         ("restirDI.spatialResampling.pValueThreshold", "ReSTIR DI: p-value threshold for PValue neighbor selection", value(ui.restirDI.spatialResamplingParams.pValueThreshold))
+        ("restirDI.spatialResampling.pValueNumCandidates", "ReSTIR DI: PValue candidate count (K, default 16)", value(ui.restirDI.spatialResamplingParams.pValueNumCandidates))
+        ("restirDI.spatialResampling.pValueEarlyStopThreshold", "ReSTIR DI: PValue early stopping threshold", value(ui.restirDI.spatialResamplingParams.pValueEarlyStopThreshold))
 
         ("restirDI.boilingFilter.enableBoilingFilter", "ReSTIR DI: enable boiling filter (0/1)", value(ui.restirDI.boilingFilter.enableBoilingFilter))
         ("restirDI.boilingFilter.boilingFilterStrength", "ReSTIR DI: boiling filter strength", value(ui.restirDI.boilingFilter.boilingFilterStrength))

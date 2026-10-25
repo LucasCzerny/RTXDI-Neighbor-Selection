@@ -202,6 +202,7 @@ private:
     nvrhi::BindingSetHandle m_prevBindingSet;
     nvrhi::BufferHandle m_constantBuffer;
     nvrhi::BufferHandle m_DIReservoirBuffer;
+    nvrhi::BufferHandle m_DIReservoirStatsBuffer;
     nvrhi::BufferHandle m_secondarySurfaceBuffer;
     nvrhi::BufferHandle m_GIReservoirBuffer;
     nvrhi::BufferHandle m_PTReservoirBuffer;

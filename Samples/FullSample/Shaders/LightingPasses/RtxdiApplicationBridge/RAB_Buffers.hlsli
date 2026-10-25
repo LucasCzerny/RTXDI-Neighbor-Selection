@@ -60,6 +60,7 @@ RWTexture2D<float2> u_RestirLuminance : register(u5);
 RWStructuredBuffer<RTXDI_PackedGIReservoir> u_GIReservoirs : register(u6);
 RWStructuredBuffer<RTXDI_PackedPTReservoir> u_PTReservoirs : register(u7);
 RWByteAddressBuffer u_SpatialNeighborSelection : register(u8);
+RWStructuredBuffer<float4> u_DIReservoirStats : register(u31);
 
 // PSR UAVs
 RWTexture2D<float> u_PSRDepth : register(u20);
@@ -107,6 +108,7 @@ SamplerState s_EnvironmentSampler : register(s1);
 
 #define RTXDI_RIS_BUFFER u_RisBuffer
 #define RTXDI_LIGHT_RESERVOIR_BUFFER u_LightReservoirs
+#define RTXDI_DI_RESERVOIR_STATS_BUFFER u_DIReservoirStats
 #define RTXDI_NEIGHBOR_OFFSETS_BUFFER t_NeighborOffsets
 #define RTXDI_GI_RESERVOIR_BUFFER u_GIReservoirs
 #define RTXDI_PT_RESERVOIR_BUFFER u_PTReservoirs
