@@ -99,6 +99,7 @@ struct SceneRendererStartupSettings
     std::optional<float3> cameraPosition;
     std::optional<float> cameraRotateSpeed;
     uint32_t saveFrameIndex = 0;
+    float saveFrameAfter = 0.0f;
     std::string saveFrameFileName;
     bool verbose = false;
     bool benchmark = false;
@@ -250,6 +251,7 @@ private:
     // Profiling
     std::shared_ptr<Profiler> m_profiler;
     time_point<steady_clock> m_prevFrameTimeStamp;
+    float m_elapsedTime = 0.0f;
     uint32_t m_renderFrameIndex = 0;
 
     // Settings

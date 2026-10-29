@@ -550,6 +550,8 @@ void SceneRenderer::Animate(float fElapsedTimeSeconds)
     if (m_ui.isLoading)
         return;
 
+    m_elapsedTime += fElapsedTimeSeconds;
+
     if (!m_args.saveFrameFileName.empty())
         fElapsedTimeSeconds = 1.f / 60.f;
 
@@ -2054,9 +2056,31 @@ void SceneRenderer::FinalFramebufferOutput(nvrhi::IFramebuffer* framebuffer)
 
 void SceneRenderer::ProcessScreenshotFrame()
 {
-    if (!m_args.saveFrameFileName.empty() && m_renderFrameIndex == m_args.saveFrameIndex)
+    if (!m_args.saveFrameFileName.empty() && m_args.saveFrameAfter == 0.0f && m_renderFrameIndex == m_args.saveFrameIndex)
     {
         bool success = SaveScreenshot(GetDevice(), m_renderTargets->LdrColor, m_args.saveFrameFileName.c_str());
+
+        //g_ExitCode = success ? 0 : 1;
+
+        glfwSetWindowShouldClose(GetDeviceManager()->GetWindow(), 1);
+    }
+    else if (!m_args.saveFrameFileName.empty() && m_args.saveFrameAfter != 0.0f && m_elapsedTime >= m_args.saveFrameAfter)
+    {
+        std::string fileName = m_args.saveFrameFileName;
+
+        const std::string placeholder = "EXACT_TIME";
+        const size_t pos = fileName.find(placeholder);
+
+        if (pos != std::string::npos)
+        {
+            fileName.replace(
+                pos,
+                placeholder.length(),
+                std::to_string(m_elapsedTime)
+            );
+        }
+
+        bool success = SaveScreenshot(GetDevice(), m_renderTargets->LdrColor, fileName.c_str());
 
         //g_ExitCode = success ? 0 : 1;
 
